@@ -1,0 +1,48 @@
+:showtitle:
+:toc: left
+:icons: font
+
+= Clippy issue?
+
+From a clean git clone of this repo:
+
+[source,text]
+----
+$ cargo clippy --version
+clippy 0.0.212 (e1884a8e 2020-12-29)
+$ cargo --version
+cargo 1.49.0 (d00d64df9 2020-12-05)
+$ cargo clean
+$ cargo clippy
+    Checking clippy-test v0.1.0 (/Users/dap/oxide/clippy-test)
+warning: using `write!()` with a format string that ends in a single newline
+ --> src/foo.rs:7:9
+  |
+7 |         write!(f, "test\n")
+  |         ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(clippy::write_with_newline)]` on by default
+  = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#write_with_newline
+help: use `writeln!()` instead
+  |
+7 |         writeln!(f, "test")
+  |         ^^^^^^^         --
+
+warning: 1 warning emitted
+
+    Finished dev [unoptimized + debuginfo] target(s) in 0.33s
+$
+----
+
+What's surprising is that https://rust-lang.github.io/rust-clippy/master/index.html#write_with_newline[that warning] is classified as "style", and we've explicitly allowed these (disabled the warning) in src/lib.rs.  Further, if you run clippy with `--allow clippy::style`, it does ignore it:
+
+[source,text]
+----
+$ cargo clean
+$ cargo clippy -- --allow clippy::style
+    Checking clippy-test v0.1.0 (/Users/dap/oxide/clippy-test)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.32s
+$
+----
+
+This doesn't seem like expected behavior.
